@@ -6,7 +6,7 @@ import time
 # Variable to store the last sent status
 last_sent_status = None
 
-# Function to fetch URL content with retries
+# Function to fetch URL content with retries 3
 def fetch_url_with_retry(url, max_retries=7, delay=1):
     retries = 0
     while retries < max_retries:
@@ -73,31 +73,31 @@ def send_product_data_to_telegram(product_name, product_status, image_url, produ
     bot_token = "7288675008:AAEuvumaPpNNbnHMJfVEPYTBVKxFjLPJwl8"
     chat_id = "-1002201592907"
     telegram_api_url = f"https://api.telegram.org/bot{bot_token}/sendPhoto"
-    message_text = f"Product Name: {product_name}\nProduct Status: {product_status}"
-    
-    # Exclude inline keyboard if the product status is "متوفر" or "سيتم توفيرها في المخزون قريباً"
-    if product_status  in ["متوفر"]:
+       # Update the message text with emojis, user-friendly language, and bold text
+    if product_status == "متوفر":
+        message_text = f"✅ **المنتج متاح** ✅: {product_name}"
         reply_markup = {
             "inline_keyboard": [
-                [{"text": "عرض المنتج", "url": product_link}],
-                [{"text": "عرض السلة", "url": "https://www.dzrt.com/ar/checkout/cart"}],
-                [{"text": "تسجيل الدخول", "url": "https://www.dzrt.com/ar/customer/account/login/"}],
-                [{"text": "الانتقال إلى رابط الدفع النهائي", "url": "https://www.dzrt.com/ar/onestepcheckout.html"}]
+                [{"text": "🔍 عرض المنتج", "url": product_link}, {"text": "🛒 عرض السلة", "url": "https://www.dzrt.com/ar/checkout/cart"}],
+                [{"text": "🔐 تسجيل الدخول", "url": "https://www.dzrt.com/ar/customer/account/login/"}, {"text": "💳 الانتقال إلى رابط الدفع النهائي", "url": "https://www.dzrt.com/ar/onestepcheckout.html"}]
             ]
         }
-        params = {
-            "chat_id": chat_id,
-            "photo": image_url,
-            "caption": message_text,
-            "reply_markup": json.dumps(reply_markup)
-        }
     else:
-        params = {
-            "chat_id": chat_id,
-            "photo": image_url,
-            "caption": message_text
+        message_text = f"❌ **نفذ من المخزون** ❌: {product_name}"
+        reply_markup = {
+            "inline_keyboard": [
+                [{"text": "🔐 تسجيل الدخول", "url": "https://www.dzrt.com/ar/customer/account/login/"}]
+            ]
         }
 
+    params = {
+        "chat_id": chat_id,
+        "photo": image_url,
+        "caption": message_text,
+        "parse_mode": "Markdown",  # Specify Markdown to enable bold text
+        "reply_markup": json.dumps(reply_markup)
+    }
+    
     response = requests.post(telegram_api_url, params=params)
     if response.status_code == 200:
         print(f"Product data sent successfully for {product_name}")
