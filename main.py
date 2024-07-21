@@ -3,7 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 import time
 
-# Variable to store the last sent status
+# Variable to store the last sent statuss
 last_sent_status = None
 
 # Function to fetch URL content with retries 3
